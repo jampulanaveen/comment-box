@@ -1,0 +1,181 @@
+<html>
+
+
+<form>
+
+comment:<br/>
+    <textarea id="commentbox" rows="10" cols="40" ></textarea>
+
+<input type="button" onclick="myfunc();" value="Enter" /> 
+
+</form>
+<input type="button" id="rollback" disabled onclick="rollBack();" value="Undo" /> 
+
+<table id="comments">
+
+</table>
+</html>
+
+
+
+<script>
+
+var arrayFromLS = [];
+var oldAry;
+
+function rollBack(){
+
+console.log(oldAry);
+ localStorage.setItem("old", JSON.stringify(oldAry));
+ var abb=JSON.parse(localStorage.getItem("old"));
+ localStorage.setItem("new", JSON.stringify(abb)); 
+ 
+	retrive();
+	document.getElementById('rollback').disabled = true; 
+}
+
+
+function clean(){
+	document.getElementById("commentbox").value="";
+}
+
+function pushToAry(id, val) {
+   var obj = {};
+   obj[id] = val;
+   arrayFromLS.push(obj);
+}
+
+
+function myfunc(){
+
+	var name =document.getElementById("commentbox").value;
+		var date = new Date();
+    var id = date.valueOf();
+
+    if(name!=""){
+    	pushToAry(id, name );
+   localStorage.setItem("new", JSON.stringify(arrayFromLS));
+   retrive();
+	}else{
+		alert("please enter your comments");
+	}
+    
+   clean();
+	//get the old values from ls and append new vales to that
+	//console.log(comments);
+	//store the values to ls
+	//append the new comments to the old ones
+	//show the data to user
+		//name must be unique
+	//show comments with new one
+}
+
+
+function showData(comments, key){
+		document.getElementById("comments").innerHTML = generateHtml(comments, key);
+}
+
+function del(id){
+	
+	// get the values from ls
+	// clear the values in ls 
+	//udate the values in ls
+	///show the values to user
+
+document.getElementById('rollback').disabled = false; 
+ arrayFromLS = JSON.parse(localStorage.getItem("new"));
+ oldAry = JSON.parse(localStorage.getItem("new"));
+ 
+
+
+
+	if(id > -1){
+		var con = confirm('Do you want to delete this comment');
+						if(con){
+							localStorage.setItem('undo','Yes');
+							//comments.splice(id, 1);
+				for(var i=0 ; i<arrayFromLS.length; i++)
+				{
+
+				    if(Object.keys(arrayFromLS[i]) == id){
+				      // alert(Object.keys(myArray[i]));
+				      
+				       arrayFromLS.splice(i,1);
+				       localStorage.setItem("new", JSON.stringify(arrayFromLS));
+				       retrive();
+
+				   
+				       }
+				   
+				}
+				    
+		}else{localStorage.setItem('undo','No');}
+	}
+	
+}
+
+
+
+
+function generateHtml(comments, id){
+	var html = "";
+	
+	for( var i=0;  i<comments.length; i++){
+		
+		html = "<tr><td>"+ comments[i] +"</td><td>"+ '<input type="button" value="x" onclick="del('+id[i]+')">' + "</td></tr>" + html;
+	}
+	var buttonStr = "";
+
+	return html;
+}
+
+function retrive(){
+
+	
+ 	var name;
+ 	var value=[];
+ 	var key=[];
+    arrayFromLS = JSON.parse(localStorage.getItem("new"));
+  
+    var length = arrayFromLS.length;
+    
+
+	for (var i=0; i<=length; i++){
+    for ( name in arrayFromLS[i]) {
+   var v = arrayFromLS[i][name];//TO FIND VALUE IN OBJECT////////
+  	value.push(v);
+   var k = Object.keys(arrayFromLS[i]);//TO FIND KEY IN OBJECT
+   key.push(k);
+    }
+    showData(value, key);
+}
+
+}
+
+
+ window.onload=function(){
+ 	var status= document.getElementById('rollback').disabled =true;
+ 	//alert(status);
+	//get the values from ls 
+	//show the values
+    arrayFromLS = JSON.parse(localStorage.getItem("new"));
+    var undo= localStorage.getItem("undo");
+
+     retrive();
+      localStorage.removeItem('undo');
+
+     if(undo == 'Yes'){
+     		oldAry = JSON.parse(localStorage.getItem("old")); 		
+    		status= document.getElementById('rollback').disabled=false;
+    		//localStorage.setItem('undo','No');
+    }else if(undo == 'No' ){
+    	
+    	status= document.getElementById('rollback').disabled=true;
+    	
+
+    }
+
+}
+
+
+</script>
